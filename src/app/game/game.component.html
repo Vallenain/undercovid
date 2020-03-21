@@ -1,1 +1,7 @@
 <h1>Bientôt les pangolins et les chauves-souris prendront leur revanche !</h1>
+<p *ngIf="player">
+  Joueur {{ player.name }} prêt à jouer !
+</p>
+<p *ngIf="game">
+  La partie {{ game.id }} est dans l'état {{ game.status }} avec les joueurs {{ game.players }}
+</p>
