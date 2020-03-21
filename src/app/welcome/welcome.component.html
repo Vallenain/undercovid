@@ -1,0 +1,24 @@
+<p *ngIf="user !== undefined">
+  Hello <span> {{ user.name }} </span> !
+  <br>
+  <input type="text" name="username" #usernameValue>
+  <button (click)="editName(usernameValue.value)" [disabled]="usernameValue.value">Edit name</button>
+</p>
+
+<div *ngIf="user === undefined" id="welcome-not-connected">
+  <h1>Undercovid</h1>
+  <h2>#ResteChezToi</h2>
+  <p>
+    Crée toi un nom de joueur, et rejoins une partie !<br>
+    <mat-form-field appearance="outline">
+      <mat-label>Ton pseudo</mat-label>
+      <input matInput placeholder="Minimum 3 lettres" type="text" name="username" #username>
+      <mat-icon matSuffix>face</mat-icon>
+    </mat-form-field><br>
+    <button mat-raised-button (click)="joinGame(username.value)">Rejoindre une partie</button>
+  </p>
+  <p>
+    <mat-icon aria-label="Les règles du jeu">menu_book</mat-icon>
+    <a href="https://docs.google.com/document/d/1EDZ2YxqaB-I0SyUyGoJwJbAEnuiE1FjVnu5MTlKz4X8/edit?usp=sharing" target="_blank">Les règles du jeu</a>
+  </p>
+</div>
