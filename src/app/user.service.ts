@@ -9,24 +9,6 @@ export interface User {
   createdAt: Date;
 }
 
-export enum PLAYER_ROLE {
-  PANGOLIN = "PANGOLIN",
-  BAT = "BAT",
-  GOOD_VIRUS = "GOOD_VIRUS",
-  UNASSIGNED = "UNASSIGNED"
-}
-
-export interface Player {
-  id: string;
-  name: string;
-  createdAt: Date;
-  isMaster: boolean;
-  nbPoints: number;
-  role: PLAYER_ROLE;
-  eliminated: boolean;
-  joinedAt: Date;
-}
-
 @Injectable({
   providedIn: 'root'
 })

@@ -1,0 +1,45 @@
+.game-master-icon {
+  color: #f1c40f;
+  margin: 0 5px;
+}
+
+.eliminated-icon {
+  color: #7f8c8d;
+  margin: 0 5px;
+}
+
+.kick-icon {
+  color: #2c3e50;
+}
+
+.section {
+  margin: 20px auto;
+}
+
+#myself {
+  text-align: center;
+}
+
+#game-master-actions {
+  mat-card-content button {
+    margin: 0 10px;
+  }
+}
+
+#players {
+
+  text-align: center;
+
+  .player-box {
+
+    text-align: center;
+    margin: 10px;
+    display: inline-block;
+
+    .player-box-card img {
+      width: 200px;
+    }
+  }
+}
+
+

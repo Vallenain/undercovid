@@ -11,6 +11,8 @@ import { environment } from '../environments/environment';
 import { UiComponentsModule } from './ui-components/ui-components.module'
 import { GameComponent } from './game/game.component';
 import { WelcomeComponent } from './welcome/welcome.component';
+import { AreyousureDialogComponent } from './areyousure-dialog/areyousure-dialog.component';
+import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
 
 
 
@@ -18,7 +20,9 @@ import { WelcomeComponent } from './welcome/welcome.component';
   declarations: [
     AppComponent,
     GameComponent,
-    WelcomeComponent
+    WelcomeComponent,
+    AreyousureDialogComponent,
+    WinnerDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -28,6 +32,10 @@ import { WelcomeComponent } from './welcome/welcome.component';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AppRoutingModule
+  ],
+  entryComponents: [
+    AreyousureDialogComponent,
+    WinnerDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

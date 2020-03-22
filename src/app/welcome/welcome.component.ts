@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import {UserService, User} from '../user.service';
@@ -9,26 +9,28 @@ import {GameService} from '../game.service';
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss']
 })
-export class WelcomeComponent implements OnInit {
+export class WelcomeComponent implements OnInit, OnDestroy {
 
   user: User;
+  private _subscriptions: any[] = [];
 
   constructor(private userService: UserService, private gameService: GameService, private router: Router) { }
 
   ngOnInit(): void {
-    this.userService.user.subscribe(user => {
+    this._subscriptions.push(this.userService.user.subscribe(user => {
       this.user = user;
-    });
+    }));
   }
 
-  editName(newName) {
-    if(!newName || newName.length < 3)
+  ngOnDestroy() {
+    // remove all subscriptions
+    this._subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  joinGame(userName): void {
+    if(!userName || userName.length < 3 || userName.length > 24)
       return;
 
-    this.userService.editName(newName);
-  }
-
-  joinGame(userName) {
     this.userService.createUser(userName).then(user => {
       this.gameService.joinOrCreateGame().then(game => {
         this.router.navigate(['/game']);

@@ -1,7 +1,97 @@
-<h1>Bientôt les pangolins et les chauves-souris prendront leur revanche !</h1>
-<p *ngIf="player">
-  Joueur {{ player.name }} prêt à jouer !
-</p>
-<p *ngIf="game">
-  La partie {{ game.id }} est dans l'état {{ game.status }} avec les joueurs {{ game.players }}
-</p>
+<div *ngIf="player">
+
+  <div id="myself" class="section">
+    <h1 class="aligner">
+      {{player.name}}
+      <mat-icon *ngIf="player.isMaster" aria-label="icône maître du jeu" class="game-master-icon">star</mat-icon>
+      <mat-icon *ngIf="player.eliminated" aria-label="icône éliminé" class="eliminated-icon">healing</mat-icon>
+    </h1>
+  </div>
+
+
+  <div id="game-master-actions" class="section" *ngIf="player.isMaster">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Actions du Maître du jeu</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+         <button mat-raised-button (click)="startGame()"  [disabled]="!game || game.status != 'OPEN' || !players || players.length < 4">
+          Débuter la partie
+        </button>
+        <button mat-raised-button (click)="redraw()"  [disabled]="!game || game.status != 'PLAYING'">
+          Changer de mot
+        </button>
+        <button mat-raised-button (click)="newGame()"  [disabled]="!game || game.status != 'CLOSED'">
+          Recommencer une partie
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+
+  <div id="game-board" *ngIf="players">
+
+    <div id="game-status" class="section">
+      <mat-card>
+        <mat-card-content>
+          <p *ngIf="game.status === 'OPEN'">
+            La partie n'a pas démarré. De nouveaux joueurs peuvent nous rejoindre.
+          </p>
+          <p *ngIf="game.status === 'WORKING'">
+            Assignation des rôles...
+          </p>
+          <p *ngIf="game.status === 'PLAYING'">
+            La partie est en cours ! <br>
+            Il y a <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.
+          </p>
+          <p *ngIf="game.status === 'CLOSED'">
+            La partie est terminée ! <br>
+            <span *ngIf="game.winner === 'PANGOLIN'">Les pangolins ont gagné !</span>
+            <span *ngIf="game.winner === 'BAT'">Les chauves-souris ont gagné !</span>
+            <span *ngIf="game.winner === 'GOOD_VIRUS'">LE BON VIRUS A TOUT CASSÉ !</span>
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div id="my-word" class="section" *ngIf="playerRole">
+      <mat-card>
+        <mat-card-content>
+          <p *ngIf="playerRole.role && playerRole.role === 'GOOD_VIRUS'">
+            Il y a les bons et les mauvais virus. Tu fais partie des bons virus. Tu veux que personne ne t'attrape !
+          </p>
+          <p *ngIf="!playerRole.role || playerRole.role !== 'GOOD_VIRUS'">
+            Ton mot est: <strong>{{ playerRole.word }}</strong>
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+
+    <div id="players" class="section">
+
+      <div class="player-box" *ngFor="let p of players">
+
+        <div class="player-box-header aligner">
+          {{p.name}}
+          <mat-icon *ngIf="p.isMaster" aria-label="icône maître du jeu" class="game-master-icon">star</mat-icon>
+          <mat-icon *ngIf="p.eliminated" aria-label="icône éliminé" class="eliminated-icon">healing</mat-icon>
+
+          <button mat-icon-button *ngIf="player.isMaster && p.id != player.id" (click)="kickPlayer(p)">
+            <mat-icon aria-label="icône pour éliminer" class="kick-icon">exit_to_app</mat-icon>
+          </button>
+
+        </div>
+
+        <div class="player-box-card">
+          <button mat-button (click)="eliminatePlayer(p)" [disabled]="game.status != 'PLAYING' || !player.isMaster || p.eliminated">
+            <img [src]="getCardImage(p)" [alt]="getCardAlt(p)">
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
