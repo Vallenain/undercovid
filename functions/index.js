@@ -79,8 +79,9 @@ exports.startGame = functions.region('europe-west1').firestore
 
           console.log(`[${gameId}] Words have been picked: batWord=${batWord}, pangolinWord=${pangolinWord}`)
 
-          // 3 : assign words to player roles
+          // 3 : assign words to player roles + tell who's first to play
           let nbBats = nbPangolins = nbGoodVirus = 0;
+          let firstToPlay;
           players.forEach(p => {
             if(p.role === "GOOD_VIRUS") {
               p.word = "";
@@ -88,9 +89,13 @@ exports.startGame = functions.region('europe-west1').firestore
             } else if(p.role === "BAT") {
               p.word = batWord;
               nbBats += 1;
+              if(!firstToPlay)
+                firstToPlay = p.id;
             } else if(p.role === "PANGOLIN") {
               p.word = pangolinWord;
               nbPangolins += 1;
+              if(!firstToPlay)
+                firstToPlay = p.id;
             }
             db.doc('games/'+gameId+'/playerRoles/'+p.id).update({
               role: p.role,
@@ -103,7 +108,8 @@ exports.startGame = functions.region('europe-west1').firestore
             status: "PLAYING",
             nbBats: nbBats,
             nbPangolins: nbPangolins,
-            nbGoodVirus: nbGoodVirus
+            nbGoodVirus: nbGoodVirus,
+            firstToPlay: firstToPlay
           })
         });
       })

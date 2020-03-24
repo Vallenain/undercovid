@@ -19,6 +19,7 @@ export class GameComponent implements OnInit, OnDestroy {
   playerRole: PlayerRole;
   players: Player[];
   playerRoles: PlayerRole[] = [];
+  firstRoundIsOver: boolean = false;
   private _subscriptions: any[] = [];
 
   constructor( private gameService: GameService, private router: Router, private dialog: MatDialog) {}
@@ -138,6 +139,7 @@ export class GameComponent implements OnInit, OnDestroy {
   fetchMissingPlayerRoles(force: boolean = false): void {
     this.players.forEach(p => {
       if(force || p.eliminated) {
+        this.firstRoundIsOver = true;
         if(this.playerRoles.find(pr => pr.id === p.id) === undefined) {
           this.gameService.getPlayerRole(p, true).then(pr => this.playerRoles.push(pr));
         }
@@ -153,6 +155,13 @@ export class GameComponent implements OnInit, OnDestroy {
       },
       disableClose: false
     });
+  }
+
+  getFirstToPlayName(): string {
+    let firstToPlay = this.players.find(p => p.id === this.game.firstToPlay);
+    if(!firstToPlay)
+      throw new Error("First to play does not exist anymore...")
+    return firstToPlay.name;
   }
 
 }

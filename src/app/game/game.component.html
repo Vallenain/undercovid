@@ -15,13 +15,16 @@
         <mat-card-title>Actions du Maître du jeu</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-         <button mat-raised-button (click)="startGame()"  [disabled]="!game || game.status != 'OPEN' || !players || players.length < 4">
+         <button mat-raised-button (click)="startGame()"  class="uc-accent"
+                 [disabled]="!game || game.status != 'OPEN' || !players || players.length < 4">
           Débuter la partie
         </button>
-        <button mat-raised-button (click)="redraw()"  [disabled]="!game || game.status != 'PLAYING'">
+        <button mat-raised-button (click)="redraw()"
+                [disabled]="!game || game.status != 'PLAYING'">
           Changer de mot
         </button>
-        <button mat-raised-button (click)="newGame()"  [disabled]="!game || game.status != 'CLOSED'">
+        <button mat-raised-button (click)="newGame()" class="uc-accent"
+                [disabled]="!game || game.status != 'CLOSED'">
           Recommencer une partie
         </button>
       </mat-card-content>
@@ -42,13 +45,14 @@
           </p>
           <p *ngIf="game.status === 'PLAYING'">
             La partie est en cours ! <br>
-            Il y a <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.
+            Il y a <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.<br>
+            <span *ngIf="!firstRoundIsOver">Le premier joueur à parler est <strong>{{ getFirstToPlayName() }}</strong>.</span>
           </p>
           <p *ngIf="game.status === 'CLOSED'">
             La partie est terminée ! <br>
-            <span *ngIf="game.winner === 'PANGOLIN'">Les pangolins ont gagné !</span>
-            <span *ngIf="game.winner === 'BAT'">Les chauves-souris ont gagné !</span>
-            <span *ngIf="game.winner === 'GOOD_VIRUS'">LE BON VIRUS A TOUT CASSÉ !</span>
+            <strong *ngIf="game.winner === 'PANGOLIN'">Les pangolins ont gagné !</strong>
+            <strong *ngIf="game.winner === 'BAT'">Les chauves-souris ont gagné !</strong>
+            <strong *ngIf="game.winner === 'GOOD_VIRUS'">LE BON VIRUS A TOUT CASSÉ !</strong>
           </p>
         </mat-card-content>
       </mat-card>

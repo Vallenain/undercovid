@@ -24,6 +24,7 @@ export interface Game {
   nbGoodVirus ?: number;
   winner ?: PLAYER_ROLE;
   finishedAt ?: Date;
+  firstToPlay ?: string;
 }
 
 export const CARDS_URL = {

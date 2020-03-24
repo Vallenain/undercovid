@@ -5,10 +5,10 @@
     Crée toi un nom de joueur, et rejoins une partie !<br>
     <mat-form-field appearance="outline">
       <mat-label>Ton pseudo</mat-label>
-      <input matInput placeholder="Entre 3 et 24 caractères" type="text" name="username" #username>
+      <input matInput placeholder="Entre 3 et 24 caractères" type="text" name="username" cdkFocusInitial #username>
       <mat-icon matSuffix>face</mat-icon>
     </mat-form-field><br>
-    <button mat-raised-button (click)="joinGame(username.value)" color="primary"
+    <button mat-raised-button (click)="joinGame(username.value)" class="uc-accent"
             [disabled]="isBusy || !username.value || username.value.length < 3 || username.value.length > 24">
       Rejoindre une partie
     </button>

@@ -26,8 +26,43 @@
 }
 
 #game-master-actions {
+
+  mat-card-title {
+    font-family: 'Acme', sans-serif;
+  }
+
   mat-card-content button {
-    margin: 0 10px;
+    margin: 10px 10px;
+  }
+}
+
+#game-status {
+
+  mat-card {
+    background-image: url("https://www.publicdomainpictures.net/pictures/310000/velka/sand-texture-background-1568731959Sq4.jpg");
+
+    mat-card-content p {
+      text-align: center;
+      font-family: 'Acme', sans-serif;
+      font-size: 20px;
+      line-height: normal;
+
+      strong {
+        font-size: larger;
+      }
+    }
+  }
+}
+
+#my-word {
+  mat-card-content p {
+    text-align: center;
+    font-family: 'Acme', sans-serif;
+    font-size: 20px;
+
+    strong {
+      font-size: larger;
+    }
   }
 }
 
