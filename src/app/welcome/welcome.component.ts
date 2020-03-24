@@ -12,6 +12,7 @@ import {GameService} from '../game.service';
 export class WelcomeComponent implements OnInit, OnDestroy {
 
   user: User;
+  isBusy: boolean: false;
   private _subscriptions: any[] = [];
 
   constructor(private userService: UserService, private gameService: GameService, private router: Router) { }
@@ -31,11 +32,19 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     if(!userName || userName.length < 3 || userName.length > 24)
       return;
 
+    this.isBusy = true;
     this.userService.createUser(userName).then(user => {
       this.gameService.joinOrCreateGame().then(game => {
+        this.isBusy = false;
         this.router.navigate(['/game']);
-      })
-    })
+      }).catch(error => {
+        console.error(error);
+        this.isBusy = false;
+      });
+    }).catch(error => {
+      console.error(error);
+      this.isBusy = false;
+    });
   }
 
 }
