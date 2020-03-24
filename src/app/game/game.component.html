@@ -38,15 +38,23 @@
       <mat-card>
         <mat-card-content>
           <p *ngIf="game.status === 'OPEN'">
-            La partie n'a pas démarré. De nouveaux joueurs peuvent nous rejoindre.
+            La partie n'a pas démarré. <br>
+            <span *ngIf="players.length < 4">Il faut au minimum 4 joueurs pour débuter une partie.</span>
+            <span *ngIf="players.length >= 4 && players.length < 10">De nouveaux joueurs peuvent nous rejoindre (jusqu'à 10).</span>
+            <span *ngIf="players.length >= 10">Nombre max de joueurs atteint. Il n'y a plus qu'à se lancer !</span>
           </p>
           <p *ngIf="game.status === 'WORKING'">
             Assignation des rôles...
           </p>
           <p *ngIf="game.status === 'PLAYING'">
             La partie est en cours ! <br>
-            Il y a <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.<br>
-            <span *ngIf="!firstRoundIsOver">Le premier joueur à parler est <strong>{{ getFirstToPlayName() }}</strong>.</span>
+            <span *ngIf="!firstRoundIsOver">
+              Il y a <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.<br>
+              Le premier joueur à parler est <strong>{{ getFirstToPlayName() }}</strong>.
+            </span>
+            <span *ngIf="firstRoundIsOver">
+              Il reste <strong>{{ game.nbPangolins }}</strong> pangolins, <strong>{{ game.nbBats }}</strong> chauve(s)-souris et <strong>{{ game.nbGoodVirus }}</strong> bon virus.<br>
+            </span>
           </p>
           <p *ngIf="game.status === 'CLOSED'">
             La partie est terminée ! <br>

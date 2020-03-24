@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
@@ -68,6 +68,18 @@ export class GameComponent implements OnInit, OnDestroy {
     this._subscriptions.forEach(s => s.unsubscribe());
   }
 
+  @HostListener('window:beforeunload', ['$event'])
+  preventLeavingGame($event: any) {
+      if(this.game.status === GAME_STATUS.WORKING || this.game.status === GAME_STATUS.PLAYING) {
+        $event.returnValue = true;
+      }
+  }
+
+  @HostListener('window:unload', ['$event'])
+  kickLeavingPlayer($event: any) {
+      this.gameService.kickPlayer(this.player);
+  }
+
   startGame(): void {
     this.gameService.startGame();
   }
@@ -123,17 +135,18 @@ export class GameComponent implements OnInit, OnDestroy {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    this._subscriptions.push(dialogRef.afterClosed().subscribe(result => {
       if(result){
         this.gameService.eliminatePlayer(player);
       } else {
         console.log("Abort! abort!");
       }
-    });
+    }));
   }
 
   kickPlayer(player: Player): void {
-    console.log("not implemented yet")
+    console.log("loup y es tu ?")
+    this.gameService.kickPlayer(player);
   }
 
   fetchMissingPlayerRoles(force: boolean = false): void {

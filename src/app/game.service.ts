@@ -25,6 +25,7 @@ export interface Game {
   winner ?: PLAYER_ROLE;
   finishedAt ?: Date;
   firstToPlay ?: string;
+  nbPlayers: number;
 }
 
 export const CARDS_URL = {
@@ -83,7 +84,6 @@ export class GameService {
       name: this.user.name,
       createdAt: this.user.createdAt,
       isMaster: isMaster,
-      nbPoints: 0,
       eliminated: false,
       joinedAt: new Date()
     }
@@ -105,7 +105,8 @@ export class GameService {
   createAndJoinGame() {
     var gameToCreate = {
       createdAt: new Date(),
-      status: GAME_STATUS.OPEN
+      status: GAME_STATUS.OPEN,
+      nbPlayers: 0
     };
     return this.afs.collection<Game>('games').add(gameToCreate).then(gameRef => {
       return this.afs.doc<Game>('games/'+gameRef.id).snapshotChanges().pipe(take(1)).toPromise().then(action => {
@@ -123,7 +124,9 @@ export class GameService {
     return this.afs.collection<Game>('games', ref => ref.where("status", "==", GAME_STATUS.OPEN))
     .snapshotChanges().pipe(take(1)).toPromise().then(actions => {
         if(actions.length > 0) {
-          return this.joinGame(actions[0].payload.doc);
+          let possibleGame = actions.find(a => a.payload.doc.get('nbPlayers') < 10)
+          if(possibleGame)
+            return this.joinGame(possibleGame.payload.doc);
         }
         return this.createAndJoinGame();
     })
@@ -154,6 +157,14 @@ export class GameService {
   eliminatePlayer(player: Player) {
     return this.afs.doc<Player>('games/'+this._game.id+'/players/'+player.id).update({
       eliminated: true
+    });
+  }
+
+  kickPlayer(player: Player) {
+    console.log("Deleting player")
+    return this.afs.doc<Player>('games/'+this._game.id+'/players/'+player.id).delete().then(() => {
+      console.log("Player deleted, deleting role")
+      return this.afs.doc<Player>('games/'+this._game.id+'/playerRoles/'+player.id).delete();
     });
   }
 }
