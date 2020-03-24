@@ -12,7 +12,7 @@ import {GameService} from '../game.service';
 export class WelcomeComponent implements OnInit, OnDestroy {
 
   user: User;
-  isBusy: boolean: false;
+  isBusy: boolean = false;
   private _subscriptions: any[] = [];
 
   constructor(private userService: UserService, private gameService: GameService, private router: Router) { }

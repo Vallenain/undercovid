@@ -43,7 +43,12 @@ export class GameComponent implements OnInit, OnDestroy {
       if(this.game.status === GAME_STATUS.PLAYING && !this.playerRole) {
         this.gameService.getPlayerRole(this.player).then(pr => this.playerRole = pr);
       } else if(this.game.status === GAME_STATUS.CLOSED) {
-        this.openWinnerDialog();
+        this.fetchMissingPlayerRoles(true);
+        this.gameService.getPlayerRole(this.player, true).then(pr => {
+          this.playerRole = pr;
+          this.openWinnerDialog();
+        });
+
       }
 
       console.debug(game);
@@ -67,7 +72,8 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   getCardImage(player: Player): string {
-    if(player.eliminated && player.id) {
+    if((this.game && this.game.status === GAME_STATUS.CLOSED)
+    || (player.eliminated && player.id)) {
       let playerRole = this.playerRoles.find(r => r.id === player.id);
       if(playerRole) {
         if(playerRole.role === PLAYER_ROLE.GOOD_VIRUS)
@@ -83,7 +89,8 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   getCardAlt(player: Player): string {
-    if(player.eliminated && player.id) {
+    if((this.game && this.game.status === GAME_STATUS.CLOSED)
+    || (player.eliminated && player.id)) {
       let playerRole = this.playerRoles.find(r => r.id === player.id);
       if(playerRole) {
         if(playerRole.role === PLAYER_ROLE.GOOD_VIRUS)
@@ -111,7 +118,8 @@ export class GameComponent implements OnInit, OnDestroy {
       data: {
         areyousureAction: `éliminer ${player.name}`,
         imgUrl: "https://media.giphy.com/media/2Y9KUyYNmXcfNMBJQB/giphy.gif"
-      }
+      },
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -127,9 +135,9 @@ export class GameComponent implements OnInit, OnDestroy {
     console.log("not implemented yet")
   }
 
-  fetchMissingPlayerRoles(): void {
+  fetchMissingPlayerRoles(force: boolean = false): void {
     this.players.forEach(p => {
-      if(p.eliminated) {
+      if(force || p.eliminated) {
         if(this.playerRoles.find(pr => pr.id === p.id) === undefined) {
           this.gameService.getPlayerRole(p, true).then(pr => this.playerRoles.push(pr));
         }
@@ -138,17 +146,10 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   openWinnerDialog(): void {
-    let imgUrl;
-    if(this.game.winner === PLAYER_ROLE.GOOD_VIRUS)
-      imgUrl = "https://media.giphy.com/media/3o7TKHugNSa7sKlpFS/giphy.gif";
-    else if(this.game.winner === PLAYER_ROLE.PANGOLIN)
-      imgUrl = "https://media.giphy.com/media/pr3OTI1LtI6FG/giphy.gif";
-    if(this.game.winner === PLAYER_ROLE.BAT)
-      imgUrl = "https://media.giphy.com/media/aV8Re460HHdZK/giphy.gif";
-
     const dialogRef = this.dialog.open(WinnerDialogComponent, {
       data: {
-        imgUrl: imgUrl
+        role: this.playerRole.role,
+        hasWon: this.game.winner === this.playerRole.role
       },
       disableClose: false
     });
