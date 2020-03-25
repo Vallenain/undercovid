@@ -3,12 +3,28 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 const db = admin.firestore();
 
+const MIN_PLAYERS = 4;
+
+const GAME_STATUS = {
+  OPEN: "OPEN", // accept players, not started yet
+  CLOSED: "CLOSED", // cannot accept player, cannot be reopen
+  WORKING: "WORKING", // some process running
+  PLAYING: "PLAYING" // players are playing
+}
+
+const PLAYER_ROLE = {
+  PANGOLIN: "PANGOLIN",
+  BAT:  "BAT",
+  GOOD_VIRUS: "GOOD_VIRUS",
+  UNASSIGNED: "UNASSIGNED"
+}
+
 function getPlayersWithRole(querySnapshot) {
   let nbPlayers = querySnapshot.docs.length;
   console.log(`Roles will be assigned to ${nbPlayers} players`);
 
   let hasGoodVirus = false;
-  if(nbPlayers > 4) {
+  if(nbPlayers > MIN_PLAYERS) {
     console.log(`There are enough players to have a GOOD_VIRUS guy !`);
     hasGoodVirus = true;
   }
@@ -53,8 +69,8 @@ function startGame(gameId) {
   return db.collection('games/'+gameId+'/players').get().then(querySnapshot => {
     let nbPlayers = querySnapshot.docs.length;
 
-    if(nbPlayers < 4) {
-      db.doc('games/'+gameId).update({status: "OPEN"});
+    if(nbPlayers < MIN_PLAYERS) {
+      db.doc('games/'+gameId).update({status: GAME_STATUS.OPEN});
       throw new Error("Not enough players to start a game");
     }
 
@@ -76,15 +92,15 @@ function startGame(gameId) {
       let nbBats = nbPangolins = nbGoodVirus = 0;
       let firstToPlay;
       players.forEach(p => {
-        if(p.role === "GOOD_VIRUS") {
+        if(p.role === PLAYER_ROLE.GOOD_VIRUS) {
           p.word = "";
           nbGoodVirus += 1;
-        } else if(p.role === "BAT") {
+        } else if(p.role === PLAYER_ROLE.BAT) {
           p.word = batWord;
           nbBats += 1;
           if(!firstToPlay)
             firstToPlay = p.id;
-        } else if(p.role === "PANGOLIN") {
+        } else if(p.role === PLAYER_ROLE.PANGOLIN) {
           p.word = pangolinWord;
           nbPangolins += 1;
           if(!firstToPlay)
@@ -98,7 +114,7 @@ function startGame(gameId) {
 
       return db.doc('games/'+gameId).update({
         startedAt: new Date(),
-        status: "PLAYING",
+        status: GAME_STATUS.PLAYING,
         nbBats: nbBats,
         nbPangolins: nbPangolins,
         nbGoodVirus: nbGoodVirus,
@@ -108,11 +124,11 @@ function startGame(gameId) {
   })
 }
 
-function winTheGame(gameId, playerId, winner, survivors) {
-  console.log(`[${gameId}][${playerId}] ${winner} have won, updating game`);
+function winTheGame(gameId, winner, survivors) {
+  console.log(`[${gameId}] ${winner} have won, updating game`);
   return db.doc('games/'+gameId).update({
     winner: winner,
-    status: "CLOSED",
+    status: GAME_STATUS.CLOSED,
     finishedAt: new Date(),
     nbPangolins: survivors.nbPangolins,
     nbBats: survivors.nbBats,
@@ -129,7 +145,7 @@ function updateGameSurvivors(gameId, survivors, nbPlayers) {
   });
 }
 
-function checkEndGame() {
+function checkEndGame(gameId) {
   return db.collection('games/'+gameId+'/players').get().then(qs1 => {
     return db.collection('games/'+gameId+'/playerRoles').get().then(qs2 => {
 
@@ -142,16 +158,16 @@ function checkEndGame() {
         return player;
       })
 
-      let survivingPangolins = playersWithRoles.filter(p => !p.eliminated && p.role === "PANGOLIN").length;
-      let survivingBats = playersWithRoles.filter(p => !p.eliminated && p.role === "BAT").length;
-      let survivingVirus = playersWithRoles.filter(p => !p.eliminated && p.role === "GOOD_VIRUS").length;
+      let survivingPangolins = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.PANGOLIN).length;
+      let survivingBats = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.BAT).length;
+      let survivingVirus = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.GOOD_VIRUS).length;
       let survivors = {
         nbPangolins: survivingPangolins,
         nbBats: survivingBats,
         nbGoodVirus: survivingVirus
       }
       let survivorsNb = survivingPangolins + survivingBats + survivingVirus;
-      console.log(`[${gameId}][${playerId}] There ${survivingPangolins} survivingPangolins, ${survivingBats} survivingBats, ${survivingVirus} survivingVirus`);
+      console.log(`[${gameId}] There ${survivingPangolins} survivingPangolins, ${survivingBats} survivingBats, ${survivingVirus} survivingVirus`);
 
       if(survivingPangolins > 0) {
         if(survivingBats > 0 || survivingVirus > 0) {
@@ -160,20 +176,20 @@ function checkEndGame() {
             return updateGameSurvivors(gameId, survivors, playersWithRoles.length);
           } else if(survivorsNb === 2) {
             if(survivingBats > 0) {
-              return winTheGame(gameId, playerId, "BAT", survivors);
+              return winTheGame(gameId, PLAYER_ROLE.BAT, survivors);
             } else {
-              return winTheGame(gameId, playerId, "GOOD_VIRUS", survivors);
+              return winTheGame(gameId, PLAYER_ROLE.GOOD_VIRUS, survivors);
             }
           }
           return updateGameSurvivors(gameId, survivors, playersWithRoles.length);
         } else {
           // pangolins have won
-          return winTheGame(gameId, playerId, "PANGOLIN", survivors);
+          return winTheGame(gameId, PLAYER_ROLE.PANGOLIN, survivors);
         }
       } else if (survivingVirus === 0) {
-        return winTheGame(gameId, playerId, "BAT", survivors);
+        return winTheGame(gameId, PLAYER_ROLE.BAT, survivors);
       } else if(survivorsNb === 2) {
-        return winTheGame(gameId, playerId, "GOOD_VIRUS", survivors);
+        return winTheGame(gameId, PLAYER_ROLE.GOOD_VIRUS, survivors);
       }
 
       // game is not over yet
@@ -234,7 +250,7 @@ exports.checkStartGame = functions.region('europe-west1').firestore
     let afterData = change.after.data();
     let beforeData = change.before.data();
 
-    if(afterData.status === "WORKING" && beforeData.status !== "WORKING") {
+    if(afterData.status === GAME_STATUS.WORKING && beforeData.status !== GAME_STATUS.WORKING) {
       return startGame(gameId);
     }
 
@@ -267,7 +283,7 @@ exports.checkEndGame = functions.region('europe-west1').firestore
     if(afterData.eliminated && !beforeData.eliminated) {
       // a player has been eliminated
       console.log(`[${gameId}][${playerId}] Has been eliminated!`);
-      return checkEndGame(gameId, playerId);
+      return checkEndGame(gameId);
     }
 
     return Promise.resolve();
@@ -280,9 +296,10 @@ exports.checkIfGameMasterIsMissing = functions.region('europe-west1').firestore
       let playerId = context.params.playerId;
       let data = snap.data();
 
+      console.log(`[${gameId}][${playerId}] Has left !`);
       return db.doc('games/'+gameId).get().then(snapshot => {
-        if(snapshot.get("status") === "PLAYING") {
-          return checkEndGame(gameId, playerId).then(() => {
+        if(snapshot.get("status") === GAME_STATUS.PLAYING) {
+          return checkEndGame(gameId).then(() => {
             if(data.isMaster)
               return checkIfGameMasterIsMissing(gameId, playerId)
             else
