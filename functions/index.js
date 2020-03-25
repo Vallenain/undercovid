@@ -110,6 +110,9 @@ function startGame(gameId) {
           role: p.role,
           word: p.word
         })
+        db.doc('games/'+gameId+'/players/'+p.id).update({
+          eliminated: false
+        })
       })
 
       return db.doc('games/'+gameId).update({
@@ -118,7 +121,10 @@ function startGame(gameId) {
         nbBats: nbBats,
         nbPangolins: nbPangolins,
         nbGoodVirus: nbGoodVirus,
-        firstToPlay: firstToPlay
+        nbPlayers: nbPangolins + nbBats + nbGoodVirus,
+        firstToPlay: firstToPlay,
+        winner: null,
+        finishedAt: null
       })
     });
   })
