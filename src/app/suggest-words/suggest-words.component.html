@@ -1,0 +1,37 @@
+<h1>Propose des mots</h1>
+
+<h2>Quelques règles:</h2>
+
+<ul>
+  <li>Les mots vont former des paires.</li>
+  <li>Les mots doivent correspondre à des concepts assez proches (ex: deux fruits rouges de petite taille, deux pays culturellement et géographiquement proches, etc.)</li>
+  <li>Mais pas trop proches non plus. Sinon les joueurs vont avoir du mal à les distinguer (ex: <em>mouche</em> et <em>moucheron</em> sont deux insectes trop similaires pour être associés)</li>
+  <li>Les mots doivent être bien orthographiés. <em>On n'est pas des bêtes.</em></li>
+</ul>
+
+<h2>1: Ecris différents mots qui peuvent aller ensemble</h2>
+
+<mat-form-field>
+  <mat-label>Ta liste de mots</mat-label>
+  <textarea matInput [(ngModel)]="wordsList" cdkTextareaAutosize rows="5"
+            placeholder="Séparés par des virgules ou des retours à la ligne">
+  </textarea>
+</mat-form-field><br>
+<button mat-raised-button class="uc-accent" (click)="generatePairs()" [disabled]="!wordsList">
+  Générer les paires de mots
+</button>
+
+
+<h2>2: Supprime les paires qui ne conviennent pas</h2>
+<div *ngFor="let pair of pairs; let pairIdx = index" class="pair-of-words">
+  <span class="word-in-pair">{{pair[0]}}</span> / <span class="word-in-pair">{{pair[1]}}</span>
+  <button mat-icon-button (click)="deletePair(pairIdx)">
+    <mat-icon>delete</mat-icon>
+  </button>
+</div>
+<div *ngIf="pairs.length === 0">
+  <em>Génère des paires à l'étape précédente.</em>
+</div>
+
+<h2>3: Envoie le tout dans la base de données !</h2>
+<button mat-raised-button class="uc-accent" (click)="savePairs()" [disabled]="pairs.length === 0">J'envoie !</button>

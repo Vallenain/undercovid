@@ -4,6 +4,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +14,7 @@ import { GameComponent } from './game/game.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { AreyousureDialogComponent } from './areyousure-dialog/areyousure-dialog.component';
 import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
+import { SuggestWordsComponent } from './suggest-words/suggest-words.component';
 
 
 
@@ -22,7 +24,8 @@ import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
     GameComponent,
     WelcomeComponent,
     AreyousureDialogComponent,
-    WinnerDialogComponent
+    WinnerDialogComponent,
+    SuggestWordsComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +34,8 @@ import { WinnerDialogComponent } from './winner-dialog/winner-dialog.component';
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   entryComponents: [
     AreyousureDialogComponent,

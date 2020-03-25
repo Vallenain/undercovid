@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatDialog} from '@angular/material/dialog';
 
 import {Game, GAME_STATUS, GameService, CARDS_URL} from '../game.service';
 import {Player, PLAYER_ROLE, PlayerRole} from '../player.service';
@@ -121,14 +121,6 @@ export class GameComponent implements OnInit, OnDestroy {
     }
 
     return "Dos de la carte";
-  }
-
-  redraw(): void {
-    console.log("not implemented yet")
-  }
-
-  newGame(): void {
-    console.log("not implemented yet")
   }
 
   eliminatePlayer(player: Player): void {
