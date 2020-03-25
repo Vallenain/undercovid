@@ -40,8 +40,8 @@ export const CARDS_URL = {
 })
 export class GameService {
 
-  BACK_CARD = "";
-
+  MAX_PLAYERS: number = 9;
+  MIN_PLAYERS: number = 4;
 
   private user: User;
   private _player: Player;
@@ -124,7 +124,7 @@ export class GameService {
     return this.afs.collection<Game>('games', ref => ref.where("status", "==", GAME_STATUS.OPEN))
     .snapshotChanges().pipe(take(1)).toPromise().then(actions => {
         if(actions.length > 0) {
-          let possibleGame = actions.find(a => a.payload.doc.get('nbPlayers') < 10)
+          let possibleGame = actions.find(a => a.payload.doc.get('nbPlayers') < this.MAX_PLAYERS)
           if(possibleGame)
             return this.joinGame(possibleGame.payload.doc);
         }

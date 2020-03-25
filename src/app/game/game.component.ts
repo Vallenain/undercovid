@@ -69,7 +69,8 @@ export class GameComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeunload', ['$event'])
   preventLeavingGame($event: any) {
-    $event.returnValue = this.game.status === GAME_STATUS.WORKING || this.game.status === GAME_STATUS.PLAYING;
+    if(this.game.status === GAME_STATUS.WORKING || this.game.status === GAME_STATUS.PLAYING)
+      $event.returnValue = true;
   }
 
   @HostListener('window:unload', ['$event'])
@@ -173,6 +174,14 @@ export class GameComponent implements OnInit, OnDestroy {
     if(!firstToPlay)
       throw new Error("First to play does not exist anymore...")
     return firstToPlay.name;
+  }
+
+  get minPlayers(): number {
+    return this.gameService.MIN_PLAYERS;
+  }
+
+  get maxPlayers(): number {
+    return this.gameService.MAX_PLAYERS;
   }
 
 }

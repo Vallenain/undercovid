@@ -16,7 +16,7 @@
       </mat-card-header>
       <mat-card-content>
          <button mat-raised-button (click)="startGame()"  class="uc-accent"
-                 [disabled]="!game || game.status != 'OPEN' || !players || players.length < 4">
+                 [disabled]="!game || game.status != 'OPEN' || !players || players.length < minPlayers">
           Débuter la partie
         </button>
         <button mat-raised-button (click)="redraw()"
@@ -39,9 +39,9 @@
         <mat-card-content>
           <p *ngIf="game.status === 'OPEN'">
             La partie n'a pas démarré. <br>
-            <span *ngIf="players.length < 4">Il faut au minimum 4 joueurs pour débuter une partie.</span>
-            <span *ngIf="players.length >= 4 && players.length < 10">De nouveaux joueurs peuvent nous rejoindre (jusqu'à 10).</span>
-            <span *ngIf="players.length >= 10">Nombre max de joueurs atteint. Il n'y a plus qu'à se lancer !</span>
+            <span *ngIf="players.length < minPlayers">Il faut au minimum {{minPlayers}} joueurs pour débuter une partie.</span>
+            <span *ngIf="players.length >= minPlayers && players.length < maxPlayers">De nouveaux joueurs peuvent nous rejoindre (jusqu'à {{maxPlayers}}).</span>
+            <span *ngIf="players.length >= maxPlayers">Nombre max de joueurs atteint. Il n'y a plus qu'à se lancer !</span>
           </p>
           <p *ngIf="game.status === 'WORKING'">
             Assignation des rôles...

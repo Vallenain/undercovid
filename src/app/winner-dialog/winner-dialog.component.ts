@@ -27,7 +27,7 @@ export class WinnerDialogComponent {
       else if(this.role === PLAYER_ROLE.PANGOLIN)
         return "https://media.giphy.com/media/pr3OTI1LtI6FG/giphy.gif";
       if(this.role === PLAYER_ROLE.BAT)
-        return "https://media.giphy.com/media/aV8Re460HHdZK/giphy.gif";
+        return "https://media.giphy.com/media/8w3ksZxYqGvjAkoWPF/giphy.gif";
     } else {
       return "https://media.giphy.com/media/3o7TKr3nzbh5WgCFxe/giphy.gif";
     }
