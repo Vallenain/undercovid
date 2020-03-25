@@ -19,11 +19,11 @@
                  [disabled]="!game || game.status != 'OPEN' || !players || players.length < minPlayers">
           Débuter la partie
         </button>
-        <button mat-raised-button (click)="redraw()"
+        <button mat-raised-button (click)="startGame()"
                 [disabled]="!game || game.status != 'PLAYING'">
           Changer de mot
         </button>
-        <button mat-raised-button (click)="newGame()" class="uc-accent"
+        <button mat-raised-button (click)="startGame()" class="uc-accent"
                 [disabled]="!game || game.status != 'CLOSED'">
           Recommencer une partie
         </button>

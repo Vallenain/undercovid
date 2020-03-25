@@ -40,7 +40,13 @@ export class GameComponent implements OnInit, OnDestroy {
       }
       this.game = game;
 
-      if(this.game.status === GAME_STATUS.PLAYING && !this.playerRole) {
+      if(this.game.status === GAME_STATUS.WORKING) {
+        if(this.playerRole)
+          this.playerRole = undefined;
+        if(this.playerRoles.length > 0)
+          this.playerRoles.length = 0;
+        this.firstRoundIsOver = false;
+      } else if(this.game.status === GAME_STATUS.PLAYING && !this.playerRole) {
         this.gameService.getPlayerRole(this.player).then(pr => this.playerRole = pr);
       } else if(this.game.status === GAME_STATUS.CLOSED) {
         if(this.game.winner !== undefined) {
