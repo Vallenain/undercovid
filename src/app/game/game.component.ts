@@ -31,7 +31,6 @@ export class GameComponent implements OnInit, OnDestroy {
         return;
       }
       this.player = player;
-      console.debug(player);
     }));
 
     this._subscriptions.push(this.gameService.game.subscribe(game => {
@@ -44,22 +43,22 @@ export class GameComponent implements OnInit, OnDestroy {
       if(this.game.status === GAME_STATUS.PLAYING && !this.playerRole) {
         this.gameService.getPlayerRole(this.player).then(pr => this.playerRole = pr);
       } else if(this.game.status === GAME_STATUS.CLOSED) {
-        this.fetchMissingPlayerRoles(true);
-        this.gameService.getPlayerRole(this.player, true).then(pr => {
-          this.playerRole = pr;
-          this.openWinnerDialog();
-        });
-
+        if(this.game.winner !== undefined) {
+          this.fetchMissingPlayerRoles(true);
+          this.gameService.getPlayerRole(this.player, true).then(pr => {
+            this.playerRole = pr;
+            this.openWinnerDialog();
+          });
+        } else {
+          this.router.navigate(['/welcome']);
+        }
       }
-
-      console.debug(game);
     }));
 
     this._subscriptions.push(this.gameService.players.subscribe(players => {
       this.players = players;
       if(this.players && this.players.length > 0)
         this.fetchMissingPlayerRoles();
-      console.debug(players);
     }));
   }
 
@@ -70,14 +69,13 @@ export class GameComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeunload', ['$event'])
   preventLeavingGame($event: any) {
-      if(this.game.status === GAME_STATUS.WORKING || this.game.status === GAME_STATUS.PLAYING) {
-        $event.returnValue = true;
-      }
+    $event.returnValue = this.game.status === GAME_STATUS.WORKING || this.game.status === GAME_STATUS.PLAYING;
   }
 
   @HostListener('window:unload', ['$event'])
   kickLeavingPlayer($event: any) {
-      this.gameService.kickPlayer(this.player);
+    // few chance it goes to the end but well, worth trying...
+    this.gameService.kickPlayer(this.player);
   }
 
   startGame(): void {

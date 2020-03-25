@@ -222,7 +222,8 @@ function checkIfGameMasterIsMissing(gameId, playerId) {
 function updateNbPlayers(gameId) {
   return db.collection('games/'+gameId+'/players').get().then(querySnapshot => {
     let nbPlayers = querySnapshot ? querySnapshot.docs.length : 0;
-    return this.db.doc('games/'+gameId).update({nbPlayers: nbPlayers});
+    console.log(`[${gameId}] ${nbPlayers} players are now part of the game.`);
+    return db.doc('games/'+gameId).update({nbPlayers: nbPlayers});
   });
 }
 
