@@ -64,7 +64,9 @@ export class SuggestWordsComponent implements OnDestroy {
           this.wordsService.savePairs(this.pairs).then(() => {
             this.snackbar.open("Les paires ont bien été sauvegardées", undefined, {
               duration: 3000
-            })
+            });
+            this.pairs.length = 0;
+            this.wordsList = "";
           }).catch(error => {
             this.snackbar.open("Erreur lors de la sauvegarde", undefined, {
               duration: 3000
