@@ -8,9 +8,8 @@ export enum PLAYER_ROLE {
 }
 
 export interface Player {
-  id: string;
+  id ?: string;
   name: string;
-  createdAt: Date;
   isMaster: boolean;
   eliminated: boolean;
   joinedAt: Date;

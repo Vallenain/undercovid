@@ -1,4 +1,4 @@
-#welcome-not-connected {
+:host > div {
   text-align: center;
 
   h1 {
@@ -6,10 +6,18 @@
     font-size: 32px;
   }
 
-  #rules {
+  #rules, #feedbacks {
     mat-icon {
       margin-right: 5px;
     }
+  }
+
+  .section, p {
+    margin: 12px 0;
+  }
+
+  mat-divider {
+    margin: 20px 0;
   }
 }
 

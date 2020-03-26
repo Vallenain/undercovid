@@ -3,7 +3,6 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentReference } from 
 import { map, take } from "rxjs/operators";
 import { from, BehaviorSubject } from "rxjs"
 
-import { User, UserService } from './user.service';
 import { Player, PLAYER_ROLE, PlayerRole } from './player.service';
 
 export enum GAME_STATUS {
@@ -43,17 +42,13 @@ export class GameService {
   MAX_PLAYERS: number = 9;
   MIN_PLAYERS: number = 4;
 
-  private user: User;
   private _player: Player;
   private _game: Game;
   game: BehaviorSubject<Game>;
   player: BehaviorSubject<Player>;
   players: BehaviorSubject<Player[]>;
 
-  constructor(private afs: AngularFirestore, private userService: UserService) {
-    userService.user.subscribe(user => {
-      this.user = user;
-    });
+  constructor(private afs: AngularFirestore) {
     this.game = new BehaviorSubject(undefined);
     this.player = new BehaviorSubject(undefined);
     this.players = new BehaviorSubject(undefined);
@@ -80,31 +75,33 @@ export class GameService {
     });
   }
 
-  joinGame(gameSnapshot, isMaster=false) {
+  joinGame(gameSnapshot, username: string, isMaster=false) {
     var playerToCreate = {
-      id: this.user.id,
-      name: this.user.name,
-      createdAt: this.user.createdAt,
+      name: username,
       isMaster: isMaster,
       eliminated: false,
       joinedAt: new Date()
     }
     var playerRoleToCreate = {
-      name: this.user.name,
+      name: username,
       role: PLAYER_ROLE.UNASSIGNED
     }
-    return this.afs.collection<Player>(`games/${gameSnapshot.id}/players`).doc(this.user.id).set(playerToCreate).then(() => {
-      this._game = gameSnapshot.data();
-      this._game.id = gameSnapshot.id;
-      this._player = playerToCreate;
-      this.game.next(this._game);
-      this.player.next(this._player);
-      this.attachGameWatchers();
-      return this.afs.collection<PlayerRole>(`games/${gameSnapshot.id}/playerRoles`).doc(this.user.id).set(playerRoleToCreate);
+    return this.afs.collection<Player>(`games/${gameSnapshot.id}/players`).add(playerToCreate).then(playerRef => {
+      return playerRef.update({id: playerRef.id}).then(() => {
+        this._game = gameSnapshot.data();
+        this._game.id = gameSnapshot.id;
+        console.log(playerRef);
+        playerToCreate['id'] = playerRef.id;
+        this._player = playerToCreate;
+        this.game.next(this._game);
+        this.player.next(this._player);
+        this.attachGameWatchers();
+        return this.afs.collection<PlayerRole>(`games/${gameSnapshot.id}/playerRoles`).doc(this._player.id).set(playerRoleToCreate);
+      })
     });
   }
 
-  createAndJoinGame() {
+  createAndJoinGame(username: string) {
     var gameToCreate = {
       createdAt: new Date(),
       status: GAME_STATUS.OPEN,
@@ -113,24 +110,21 @@ export class GameService {
     return this.afs.collection<Game>('games').add(gameToCreate).then(gameRef => {
       return this.afs.doc<Game>('games/'+gameRef.id).snapshotChanges().pipe(take(1)).toPromise().then(action => {
         if(action)
-          return this.joinGame(action.payload, true);
+          return this.joinGame(action.payload, username, true);
         return Promise.reject("Could not find newly created game " + gameRef.id);
       })
     })
   }
 
-  joinOrCreateGame() {
-    if(!this.user)
-      return Promise.reject("No user found");
-
-    return this.afs.collection<Game>('games', ref => ref.where("status", "==", GAME_STATUS.OPEN))
-    .snapshotChanges().pipe(take(1)).toPromise().then(actions => {
-        if(actions.length > 0) {
-          let possibleGame = actions.find(a => a.payload.doc.get('nbPlayers') < this.MAX_PLAYERS)
-          if(possibleGame)
-            return this.joinGame(possibleGame.payload.doc);
-        }
-        return this.createAndJoinGame();
+  findOpenGame(gameId: string) {
+    return this.afs.doc<Game>(`games/`+gameId).get().pipe(take(1)).toPromise().then(snapshot => {
+      if(!snapshot.exists)
+        return Promise.reject("Game has not been found");
+      if(snapshot.get("status") !== GAME_STATUS.OPEN)
+        return Promise.reject("Game is not open");
+      if(snapshot.get("nbPlayers") >= 10)
+        return Promise.reject("Max number of players reached");
+      return snapshot;
     })
   }
 

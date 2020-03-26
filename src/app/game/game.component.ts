@@ -27,6 +27,7 @@ export class GameComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this._subscriptions.push(this.gameService.player.subscribe(player => {
       if(!player) {
+        console.log("No player")
         this.router.navigate(['/welcome']);
         return;
       }
@@ -35,6 +36,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this._subscriptions.push(this.gameService.game.subscribe(game => {
       if(!game) {
+        console.log("No game")
         this.router.navigate(['/welcome']);
         return;
       }
@@ -56,6 +58,7 @@ export class GameComponent implements OnInit, OnDestroy {
             this.openWinnerDialog();
           });
         } else {
+          console.log("Game manually closed")
           this.router.navigate(['/welcome']);
         }
       }
@@ -65,6 +68,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.players = players;
       if(this.players && this.players.length > 0) {
         if(this.players.find(p => p.id === this.player.id) === undefined) {
+          console.log("Current player not in players list")
           this.router.navigate(['/welcome']);
           return;
         }
@@ -147,7 +151,6 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   kickPlayer(player: Player): void {
-    console.log("loup y es tu ?")
     this.gameService.kickPlayer(player);
   }
 
