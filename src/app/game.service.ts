@@ -72,7 +72,9 @@ export class GameService {
     });
     this.afs.doc<Player>("games/"+this._game.id+"/players/"+this._player.id).valueChanges().subscribe(player => {
       console.log("player has changed", player);
-      player.id = this._player.id;
+      if(player) {
+        player.id = this._player.id;
+      }
       this._player = player;
       this.player.next(this._player);
     });

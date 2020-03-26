@@ -63,8 +63,13 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this._subscriptions.push(this.gameService.players.subscribe(players => {
       this.players = players;
-      if(this.players && this.players.length > 0)
+      if(this.players && this.players.length > 0) {
+        if(this.players.find(p => p.id === this.player.id) === undefined) {
+          this.router.navigate(['/welcome']);
+          return;
+        }
         this.fetchMissingPlayerRoles();
+      }
     }));
   }
 

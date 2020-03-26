@@ -54,7 +54,7 @@ export class SuggestWordsComponent implements OnDestroy {
     if(this.pairs.length > 0) {
       const dialogRef = this.dialog.open(AreyousureDialogComponent, {
         data: {
-          areyousureAction: `soumettre ces paires`
+          areyousureAction: "soumettre ces paires"
         },
         disableClose: true
       });
