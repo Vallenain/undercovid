@@ -3,8 +3,8 @@
   <div id="myself" class="section">
     <h1 class="aligner">
       {{player.name}}
-      <mat-icon *ngIf="player.isMaster" aria-label="icône maître du jeu" class="game-master-icon">star</mat-icon>
-      <mat-icon *ngIf="player.eliminated" aria-label="icône éliminé" class="eliminated-icon">healing</mat-icon>
+      <mat-icon *ngIf="player.isMaster" aria-label="icône maître du jeu" class="game-master-icon" matTooltip="Tu es Maître du jeu">star</mat-icon>
+      <mat-icon *ngIf="player.eliminated" aria-label="icône éliminé" class="eliminated-icon" matTooltip="Tu es éliminé">healing</mat-icon>
     </h1>
   </div>
 
@@ -19,15 +19,15 @@
         <mat-card-title>Actions du Maître du jeu</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-         <button mat-raised-button (click)="startGame()"  class="uc-accent"
+         <button mat-raised-button (click)="startGame()"  class="uc-accent" matTooltip="Débute la partie"
                  [disabled]="!game || game.status != 'OPEN' || !players || players.length < minPlayers">
           Débuter la partie
         </button>
-        <button mat-raised-button (click)="startGame()"
+        <button mat-raised-button (click)="startGame()" matTooltip="Change de mot si celui-ci ne convient pas"
                 [disabled]="!game || game.status != 'PLAYING'">
           Changer de mot
         </button>
-        <button mat-raised-button (click)="startGame()" class="uc-accent"
+        <button mat-raised-button (click)="startGame()" class="uc-accent" matTooltip="Recommence une partie avec les mêmes joueurs"
                 [disabled]="!game || game.status != 'CLOSED'">
           Recommencer une partie
         </button>
@@ -90,17 +90,38 @@
 
         <div class="player-box-header aligner">
           {{p.name}}
-          <mat-icon *ngIf="p.isMaster" aria-label="icône maître du jeu" class="game-master-icon">star</mat-icon>
-          <mat-icon *ngIf="p.eliminated" aria-label="icône éliminé" class="eliminated-icon">healing</mat-icon>
+          <mat-icon *ngIf="p.isMaster"
+                    aria-label="icône maître du jeu"
+                    class="game-master-icon"
+                    matTooltip="Maître du jeu">
+            star
+          </mat-icon>
+          <mat-icon *ngIf="p.eliminated"
+                    aria-label="icône éliminé"
+                    class="eliminated-icon"
+                    matTooltip="Joueur éliminé">
+            healing
+          </mat-icon>
 
-          <button mat-icon-button *ngIf="player.isMaster && p.id != player.id" (click)="kickPlayer(p)">
-            <mat-icon aria-label="icône pour éliminer" class="kick-icon">exit_to_app</mat-icon>
+          <button mat-icon-button *ngIf="player.isMaster && game.status === 'PLAYING' && !p.eliminated"
+                  (click)="eliminatePlayer(p)"
+                  matTooltip="Pour éliminer le joueur">
+            <mat-icon aria-label="icône pour éliminer un joueur" class="eliminate-icon">gavel</mat-icon>
+          </button>
+
+          <button mat-icon-button *ngIf="player.isMaster && p.id != player.id"
+                  (click)="kickPlayer(p)"
+                  matTooltip="Pour exclure le joueur de cette partie">
+            <mat-icon aria-label="icône pour kicker le joueur" class="kick-icon">exit_to_app</mat-icon>
           </button>
 
         </div>
 
         <div class="player-box-card">
-          <button mat-button (click)="eliminatePlayer(p)" [disabled]="game.status != 'PLAYING' || !player.isMaster || p.eliminated">
+          <button mat-button (click)="eliminatePlayer(p)"
+                  matTooltip="Pour éliminer le joueur"
+                  [matTooltipDisabled]="game.status != 'PLAYING' || !player.isMaster || p.eliminated"
+                  [disabled]="game.status != 'PLAYING' || !player.isMaster || p.eliminated">
             <img [src]="getCardImage(p)" [alt]="getCardAlt(p)">
           </button>
         </div>

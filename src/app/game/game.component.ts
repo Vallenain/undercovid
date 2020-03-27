@@ -135,7 +135,7 @@ export class GameComponent implements OnInit, OnDestroy {
   eliminatePlayer(player: Player): void {
     const dialogRef = this.dialog.open(AreyousureDialogComponent, {
       data: {
-        areyousureAction: `éliminer ${player.name}`,
+        areyousureAction: `éliminer (démocratiquement) ${player.name}`,
         imgUrl: "https://media.giphy.com/media/2Y9KUyYNmXcfNMBJQB/giphy.gif"
       },
       disableClose: true
@@ -151,7 +151,20 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   kickPlayer(player: Player): void {
-    this.gameService.kickPlayer(player);
+    const dialogRef = this.dialog.open(AreyousureDialogComponent, {
+      data: {
+        areyousureAction: `exclure ${player.name} de la partie`
+      },
+      disableClose: true
+    });
+
+    this._subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        this.gameService.kickPlayer(player);
+      } else {
+        console.log("Abort! abort!");
+      }
+    }));
   }
 
   fetchMissingPlayerRoles(force: boolean = false): void {
