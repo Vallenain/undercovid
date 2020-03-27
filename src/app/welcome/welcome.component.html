@@ -5,7 +5,7 @@
     Crée toi un nom de joueur, et rejoins une partie !<br><br>
     <mat-form-field appearance="outline">
       <mat-label>Ton pseudo</mat-label>
-      <input matInput placeholder="Entre 3 et 24 caractères" type="text" name="username" cdkFocusInitial #username>
+      <input matInput placeholder="Entre 3 et 24 caractères" type="text" name="username" cdkFocusInitial [(ngModel)]="username">
       <mat-icon matSuffix>face</mat-icon>
     </mat-form-field>
   </div>
@@ -14,8 +14,8 @@
 
   <div class="section">
 
-    <button mat-raised-button (click)="createGame(username.value)" class="uc-accent"
-            [disabled]="!canCreateGame(username.value)">
+    <button mat-raised-button (click)="createGame(username)" class="uc-accent"
+            [disabled]="!canCreateGame(username)">
       Créer une nouvelle partie
     </button>
 
@@ -23,12 +23,12 @@
 
     <mat-form-field appearance="outline">
       <mat-label>ID de partie existante</mat-label>
-      <input matInput placeholder="20 caractères" type="text" name="gameId" #gameId>
+      <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
       <mat-icon matSuffix>casino</mat-icon>
     </mat-form-field><br>
 
-    <button mat-raised-button (click)="joinGame(username.value, gameId.value)" class="uc-accent"
-            [disabled]="!canJoinExistingGame(username.value, gameId.value)">
+    <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
+            [disabled]="!canJoinExistingGame(username, gameId)">
       Rejoindre une partie existante
     </button>
 

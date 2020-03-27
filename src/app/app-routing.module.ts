@@ -19,7 +19,7 @@ const routes: Routes = [
     component: WelcomeComponent,
   },
   { path: '**',
-    redirectTo: '/welcome'
+    redirectTo: 'welcome'
   }
 ];
 

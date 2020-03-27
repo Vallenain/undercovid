@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import{ Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 
@@ -22,7 +22,9 @@ export class GameComponent implements OnInit, OnDestroy {
   firstRoundIsOver: boolean = false;
   private _subscriptions: any[] = [];
 
-  constructor( private gameService: GameService, private router: Router, private dialog: MatDialog) {}
+  constructor( private gameService: GameService,
+  private router: Router,
+  private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this._subscriptions.push(this.gameService.player.subscribe(player => {
@@ -92,6 +94,10 @@ export class GameComponent implements OnInit, OnDestroy {
   kickLeavingPlayer($event: any) {
     // few chance it goes to the end but well, worth trying...
     this.gameService.kickPlayer(this.player);
+  }
+
+  get gameUrlToShare(): string {
+    return window.origin + '/?join-game=' + this.game.id;
   }
 
   startGame(): void {

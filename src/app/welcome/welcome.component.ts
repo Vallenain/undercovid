@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import {MatSnackBar} from '@angular/material/snack-bar';
+
 
 import {GameService} from '../game.service';
 
@@ -9,13 +10,23 @@ import {GameService} from '../game.service';
   templateUrl: './welcome.component.html',
   styleUrls: ['./welcome.component.scss']
 })
-export class WelcomeComponent {
+export class WelcomeComponent implements OnInit {
 
   isBusy: boolean = false;
+  username: string;
+  gameId: string;
 
   constructor(private gameService: GameService,
   private router: Router,
-  private snackbar: MatSnackBar) { }
+  private snackbar: MatSnackBar,
+  private route: ActivatedRoute) { }
+
+  ngOnInit() {
+    let gameId = this.route.snapshot.queryParamMap.get("join-game");
+    if(gameId) {
+      this.gameId = gameId;
+    }
+  }
 
   joinGame(username: string, gameId: string): void {
     if(!this.canJoinExistingGame(username, gameId))
