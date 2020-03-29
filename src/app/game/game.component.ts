@@ -105,6 +105,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   startGame(): void {
+    this.firstRoundIsOver = false; // reset first round
     this.gameService.startGame();
   }
 
