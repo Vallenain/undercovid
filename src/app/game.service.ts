@@ -90,7 +90,6 @@ export class GameService {
       return playerRef.update({id: playerRef.id}).then(() => {
         this._game = gameSnapshot.data();
         this._game.id = gameSnapshot.id;
-        console.log(playerRef);
         playerToCreate['id'] = playerRef.id;
         this._player = playerToCreate;
         this.game.next(this._game);
@@ -165,11 +164,20 @@ export class GameService {
   }
 
   virusHasGuessed(guessWord: string) {
-    console.log("Virus has guessed " + guessWord);
     if(guessWord) {
       return this.afs.doc<PlayerRole>('games/'+this._game.id+'/playerRoles/'+this._player.id).update({guessWord: guessWord});
     } else {
       return this.afs.doc<PlayerRole>('games/'+this._game.id+'/playerRoles/'+this._player.id).update({virusGuess: VIRUS_GUESS.GUESSED_WRONG});
     }
+  }
+
+  reopenGame() {
+    return this.afs.doc<Game>('games/'+this._game.id).update({status: GAME_STATUS.OPEN}).then(() => {
+      return this.afs.collection<Player>('games/'+this._game.id+'/players').get().pipe(take(1)).toPromise().then(snapshot => {
+        console.log(snapshot);
+        let promises = snapshot.docs.map(d => d.ref.update({eliminated: false}));
+        return Promise.all(promises);
+      })
+    });
   }
 }

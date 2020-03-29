@@ -9,7 +9,7 @@
   </div>
 
   <div class="section">
-    Pour rejoindre la partie: <a [href]="gameUrlToShare">{{ gameUrlToShare }}</a>
+    Pour rejoindre la partie: <a [href]="gameUrlToShare" target="_blank">{{ gameUrlToShare }}</a>
   </div>
 
 
@@ -27,7 +27,7 @@
                 [disabled]="!game || game.status != 'PLAYING'">
           Changer de mot
         </button>
-        <button mat-raised-button (click)="startGame()" class="uc-accent" matTooltip="Recommence une partie avec les mêmes joueurs"
+        <button mat-raised-button (click)="reopenGame()" class="uc-accent" matTooltip="Recommence une partie"
                 [disabled]="!game || game.status != 'CLOSED'">
           Recommencer une partie
         </button>

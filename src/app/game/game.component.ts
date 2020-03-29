@@ -48,7 +48,7 @@ export class GameComponent implements OnInit, OnDestroy {
       }
       this.game = game;
 
-      if(this.game.status === GAME_STATUS.WORKING) {
+      if(this.game.status === GAME_STATUS.OPEN || this.game.status === GAME_STATUS.WORKING) {
         if(this.playerRole)
           this.playerRole = undefined;
         if(this.playerRoles.length > 0)
@@ -106,6 +106,11 @@ export class GameComponent implements OnInit, OnDestroy {
 
   startGame(): void {
     this.gameService.startGame();
+  }
+
+  reopenGame(): void {
+    // difference with `startGame` is that game will go to OPEN status and so accept new players to join
+    this.gameService.reopenGame();
   }
 
   getCardImage(player: Player): string {
