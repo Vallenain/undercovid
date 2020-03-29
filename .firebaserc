@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "undercovid"
+  },
+  "targets": {
+    "undercovid": {
+      "hosting": {
+        "undercovid": [
+          "undercovid"
+        ]
+      }
+    }
+  }
+}

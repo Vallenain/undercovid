@@ -1,0 +1,23 @@
+:host > div {
+  text-align: center;
+
+  h1 {
+    font-family: 'Acme', sans-serif;
+    font-size: 32px;
+  }
+
+  #rules, #feedbacks, #github {
+    mat-icon {
+      margin-right: 5px;
+    }
+  }
+
+  .section, p {
+    margin: 12px 0;
+  }
+
+  mat-divider {
+    margin: 20px 0;
+  }
+}
+

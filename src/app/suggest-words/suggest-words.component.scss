@@ -1,0 +1,18 @@
+h1, h2 {
+  font-family: 'Acme', sans-serif;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.pair-of-words mat-icon {
+  color: grey;
+
+  &:hover {
+    color: black;
+  }
+}
+
+mat-form-field {
+  width: 50%;
+  min-width: 300px;
+}

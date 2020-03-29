@@ -1,0 +1,13 @@
+<div mat-dialog-content>
+  <p id="game-result">
+    <span *ngIf="hasWon">VOUS AVEZ GAGNÉ !!!</span>
+    <span *ngIf="!hasWon">VOUS AVEZ PERDU !!!</span>
+  </p>
+  <p>
+    Vous étiez
+    <span *ngIf="role === 'PANGOLIN'">un pangolin !</span>
+    <span *ngIf="role === 'BAT'">une chauve-souris !</span>
+    <span *ngIf="role === 'GOOD_VIRUS'">le bon virus !</span>
+  </p>
+  <img [src]="imageUrl">
+</div>
