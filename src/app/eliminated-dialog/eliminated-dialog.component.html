@@ -1,0 +1,25 @@
+<div mat-dialog-content>
+  <p>Tu t'es fait tej !</p>
+  <blockquote>T'es mauvais Jack !</blockquote>
+
+  <div *ngIf="isGoodVirus">
+    <p>
+      Mais comme tu es le bon virus, tu peux encore gagner la partie en devinant le mot des pangolins.<br>
+      Tu as <strong>{{ remainingTime }}</strong> secondes !
+    </p>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Ton intuition</mat-label>
+      <input matInput placeholder="Quel est le mot des pangolins ?" type="text" name="virusGuessWord" [(ngModel)]="virusGuessWord">
+      <mat-icon matSuffix>flash_on</mat-icon>
+    </mat-form-field><br>
+
+    <button mat-raised-button (click)="giveup()">
+      Aucune idée...
+    </button>
+    <button mat-raised-button (click)="guess()" class="uc-accent"
+            [disabled]="!virusGuessWord">
+      Deviner !
+    </button>
+  </div>
+</div>

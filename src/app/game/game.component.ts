@@ -3,9 +3,10 @@ import { Router } from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 
 import {Game, GAME_STATUS, GameService, CARDS_URL} from '../game.service';
-import {Player, PLAYER_ROLE, PlayerRole} from '../player.service';
+import {Player, PLAYER_ROLE, PlayerRole} from '../player';
 import {AreyousureDialogComponent} from '../areyousure-dialog/areyousure-dialog.component';
 import {WinnerDialogComponent} from '../winner-dialog/winner-dialog.component';
+import {EliminatedDialogComponent} from '../eliminated-dialog/eliminated-dialog.component';
 
 @Component({
   selector: 'app-game',
@@ -34,6 +35,9 @@ export class GameComponent implements OnInit, OnDestroy {
         return;
       }
       this.player = player;
+      if(this.player.eliminated) {
+        this.openEliminatedDialog();
+      }
     }));
 
     this._subscriptions.push(this.gameService.game.subscribe(game => {
@@ -192,6 +196,22 @@ export class GameComponent implements OnInit, OnDestroy {
       },
       disableClose: false
     });
+  }
+
+  openEliminatedDialog(): void {
+    const isGoodVirus = this.playerRole.role === PLAYER_ROLE.GOOD_VIRUS;
+    const dialogRef = this.dialog.open(EliminatedDialogComponent, {
+      data: {
+        isGoodVirus: isGoodVirus
+      },
+      disableClose: isGoodVirus
+    });
+
+    if(isGoodVirus) {
+      this._subscriptions.push(dialogRef.afterClosed().subscribe(result => {
+        this.gameService.virusHasGuessed(result);
+      }));
+    }
   }
 
   getFirstToPlayName(): string {

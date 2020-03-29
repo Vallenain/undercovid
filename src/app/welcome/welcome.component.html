@@ -14,7 +14,7 @@
 
   <div class="section">
 
-    <button mat-raised-button (click)="createGame(username)" class="uc-accent"
+    <button mat-raised-button (click)="createGame(username)" [class.uc-accent]="!gameId"
             [disabled]="!canCreateGame(username)">
       Créer une nouvelle partie
     </button>
@@ -44,6 +44,11 @@
   <div id="feedbacks" class="aligner section">
     <mat-icon aria-label="Tes commentaires">chat</mat-icon>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLScFQJ-jgiBPQS_x71HSikIngQmepNze8H-mT1T1v2QvLMUZ3A/viewform" target="_blank">Pour faire part d'un bug ou d'une idée</a>
+  </div>
+
+  <div id="github" class="aligner section">
+    <mat-icon aria-label="Repository Github" svgIcon="github"></mat-icon>
+    <a href="https://github.com/Vallenain/undercovid" target="_blank">Le code sur GitHub</a>
   </div>
 
   <p>

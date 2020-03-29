@@ -3,7 +3,7 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentReference } from 
 import { map, take } from "rxjs/operators";
 import { from, BehaviorSubject } from "rxjs"
 
-import { Player, PLAYER_ROLE, PlayerRole } from './player.service';
+import { Player, PLAYER_ROLE, PlayerRole, VIRUS_GUESS } from './player';
 
 export enum GAME_STATUS {
   OPEN = "OPEN", // accept players, not started yet
@@ -162,5 +162,14 @@ export class GameService {
       console.log("Player deleted, deleting role")
       return this.afs.doc<Player>('games/'+this._game.id+'/playerRoles/'+player.id).delete();
     });
+  }
+
+  virusHasGuessed(guessWord: string) {
+    console.log("Virus has guessed " + guessWord);
+    if(guessWord) {
+      return this.afs.doc<PlayerRole>('games/'+this._game.id+'/playerRoles/'+this._player.id).update({guessWord: guessWord});
+    } else {
+      return this.afs.doc<PlayerRole>('games/'+this._game.id+'/playerRoles/'+this._player.id).update({virusGuess: VIRUS_GUESS.GUESSED_WRONG});
+    }
   }
 }

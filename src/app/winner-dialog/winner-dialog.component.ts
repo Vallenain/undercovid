@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 
-import {PLAYER_ROLE} from '../player.service';
+import {PLAYER_ROLE} from '../player';
 
 @Component({
   selector: 'app-winner-dialog',

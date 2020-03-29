@@ -19,6 +19,12 @@ const PLAYER_ROLE = {
   UNASSIGNED: "UNASSIGNED"
 }
 
+const VIRUS_GUESS = {
+  NULL: "NULL", // not guessed yet
+  GUESSED_RIGHT: "GUESSED_RIGHT",
+  GUESSED_WRONG: "GUESSED_WRONG"
+}
+
 function getPlayersWithRole(querySnapshot) {
   let nbPlayers = querySnapshot.docs.length;
   console.log(`Roles will be assigned to ${nbPlayers} players`);
@@ -108,7 +114,8 @@ function startGame(gameId) {
         }
         db.doc('games/'+gameId+'/playerRoles/'+p.id).update({
           role: p.role,
-          word: p.word
+          word: p.word,
+          virusGuess: VIRUS_GUESS.NULL
         })
         db.doc('games/'+gameId+'/players/'+p.id).update({
           eliminated: false
@@ -161,27 +168,32 @@ function checkEndGame(gameId) {
           throw new Error("Unable to find a role for player " + d.id);
         let player = d.data();
         player.role = roleDoc.get("role");
+        player.virusGuess = roleDoc.get("virusGuess");
         return player;
       })
 
-      let survivingPangolins = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.PANGOLIN).length;
-      let survivingBats = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.BAT).length;
-      let survivingVirus = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.GOOD_VIRUS).length;
+      let survivingPangolinsNb = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.PANGOLIN).length;
+      let survivingBatsNb = playersWithRoles.filter(p => !p.eliminated && p.role === PLAYER_ROLE.BAT).length;
+      let survivingVirus = playersWithRoles.find(p => p.role === PLAYER_ROLE.GOOD_VIRUS && p.virusGuess !== VIRUS_GUESS.GUESSED_WRONG);
+      let survivingVirusNb = survivingVirus ? 1 : 0;
       let survivors = {
-        nbPangolins: survivingPangolins,
-        nbBats: survivingBats,
-        nbGoodVirus: survivingVirus
+        nbPangolins: survivingPangolinsNb,
+        nbBats: survivingBatsNb,
+        nbGoodVirus: survivingVirusNb
       }
-      let survivorsNb = survivingPangolins + survivingBats + survivingVirus;
-      console.log(`[${gameId}] There ${survivingPangolins} survivingPangolins, ${survivingBats} survivingBats, ${survivingVirus} survivingVirus`);
+      let survivorsNb = survivingPangolinsNb + survivingBatsNb + survivingVirusNb;
+      console.log(`[${gameId}] There ${survivingPangolinsNb} survivingPangolins, ${survivingBatsNb} survivingBats, ${survivingVirusNb} survivingVirus`);
 
-      if(survivingPangolins > 0) {
-        if(survivingBats > 0 || survivingVirus > 0) {
-          if(survivingBats > 0 && survivingVirus > 0) {
+      if(survivingVirus && survivingVirus.virusGuess === VIRUS_GUESS.GUESSED_RIGHT)
+        return winTheGame(gameId, PLAYER_ROLE.GOOD_VIRUS, survivors)
+
+      if(survivingPangolinsNb > 0) {
+        if(survivingBatsNb > 0 || survivingVirus) {
+          if(survivingBatsNb > 0 && survivingVirus) {
             // game is not over yet
             return updateGameSurvivors(gameId, survivors, playersWithRoles.length);
           } else if(survivorsNb === 2) {
-            if(survivingBats > 0) {
+            if(survivingBatsNb > 0) {
               return winTheGame(gameId, PLAYER_ROLE.BAT, survivors);
             } else {
               return winTheGame(gameId, PLAYER_ROLE.GOOD_VIRUS, survivors);
@@ -192,7 +204,7 @@ function checkEndGame(gameId) {
           // pangolins have won
           return winTheGame(gameId, PLAYER_ROLE.PANGOLIN, survivors);
         }
-      } else if (survivingVirus === 0) {
+      } else if (!survivingVirus) {
         return winTheGame(gameId, PLAYER_ROLE.BAT, survivors);
       } else if(survivorsNb === 2) {
         return winTheGame(gameId, PLAYER_ROLE.GOOD_VIRUS, survivors);
@@ -249,6 +261,19 @@ function updateNbPlayers(gameId) {
   });
 }
 
+function checkGuessedWord(gameId, playerId, guessWord) {
+  return db.collection('games/'+gameId+'/playerRoles').get().then(querySnapshot => {
+    let pangolin = querySnapshot.docs.find(d => d.get("role") === PLAYER_ROLE.PANGOLIN);
+    if(!pangolin)
+      throw new Error("Unable to find a pangolin in game " + gameId)
+
+    let virusGuess = pangolin.get("word").toLowerCase() === guessWord.toLowerCase() ? VIRUS_GUESS.GUESSED_RIGHT : VIRUS_GUESS.GUESSED_WRONG;
+    return db.doc('games/'+gameId+'/playerRoles/'+playerId).update({
+      virusGuess: virusGuess
+    });
+  })
+}
+
 exports.checkStartGame = functions.region('europe-west1').firestore
   .document('games/{gameId}')
   .onUpdate((change, context) => {
@@ -290,6 +315,28 @@ exports.checkEndGame = functions.region('europe-west1').firestore
       // a player has been eliminated
       console.log(`[${gameId}][${playerId}] Has been eliminated!`);
       return checkEndGame(gameId);
+    }
+
+    return Promise.resolve();
+  })
+
+exports.checkVirusGuess = functions.region('europe-west1').firestore
+  .document('games/{gameId}/playerRoles/{playerId}')
+  .onUpdate((change, context) => {
+    let gameId = context.params.gameId;
+    let playerId = context.params.playerId;
+    let afterData = change.after.data();
+    let beforeData = change.before.data();
+
+    if(beforeData.virusGuess === VIRUS_GUESS.NULL) {
+      if(afterData.virusGuess !== beforeData.virusGuess) {
+        console.log(`[${gameId}][${playerId}] Virus has made a guess: ${afterData.virusGuess}`);
+        return checkEndGame(gameId);
+      } else if(afterData.guessWord) {
+        console.log(`[${gameId}][${playerId}] Virus has made a guess: ${afterData.guessWord}`);
+        // this will call this same trigger just after because virusGuess ppty will be updated
+        return checkGuessedWord(gameId, playerId, afterData.guessWord);
+      }
     }
 
     return Promise.resolve();

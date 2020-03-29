@@ -38,7 +38,7 @@ export class SuggestWordsComponent implements OnDestroy {
     let words = this.wordsList.split(/,|\n/).map(s => {
       s = s.trim();
       if(s) {
-        s = s[0].toUpperCase() + s.slice(1).toLowerCase();
+        s = s[0].toUpperCase() + s.slice(1);
       }
       return s;
     }).filter(s => s !== "");
