@@ -89,7 +89,7 @@
       <div class="player-box" *ngFor="let p of players">
 
         <div class="player-box-header aligner">
-          {{p.name}}
+          <span *ngIf="getPlayerOrder(p) !== undefined">{{ getPlayerOrder(p) }}.</span>{{ p.name }}
           <mat-icon *ngIf="p.isMaster"
                     aria-label="icône maître du jeu"
                     class="game-master-icon"

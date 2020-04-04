@@ -25,10 +25,11 @@
     "@angular/platform-browser-dynamic": "~9.0.3",
     "@angular/router": "~9.0.3",
     "@angular/service-worker": "~9.0.3",
+    "async-mutex": "^0.1.4",
+    "firebase": ">= 5.5.7 <8",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
-    "zone.js": "~0.10.2",
-    "firebase": ">= 5.5.7 <8"
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.4",
