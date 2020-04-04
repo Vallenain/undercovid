@@ -1,12 +1,20 @@
 {
   "projects": {
-    "default": "undercovid"
+    "default": "undercovid-dev",
+    "prod": "undercovid"
   },
   "targets": {
     "undercovid": {
       "hosting": {
         "undercovid": [
           "undercovid"
+        ]
+      }
+    },
+    "undercovid-dev": {
+      "hosting": {
+        "undercovid": [
+          "undercovid-dev"
         ]
       }
     }
