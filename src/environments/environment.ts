@@ -5,14 +5,14 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyDQFFO4GmkZPWf53GstwESrNE-o048fVyk",
-    authDomain: "undercovid.firebaseapp.com",
-    databaseURL: "https://undercovid.firebaseio.com",
-    projectId: "undercovid",
-    storageBucket: "undercovid.appspot.com",
-    messagingSenderId: "66316591799",
-    appId: "1:66316591799:web:6c226bec022340bac6a332",
-    measurementId: "G-QZKJMNFGPC"
+    apiKey: "AIzaSyCI2778boDsgKdrV-WIgafMMzkO9QF4MYE",
+    authDomain: "undercovid-dev.firebaseapp.com",
+    databaseURL: "https://undercovid-dev.firebaseio.com",
+    projectId: "undercovid-dev",
+    storageBucket: "undercovid-dev.appspot.com",
+    messagingSenderId: "521437084760",
+    appId: "1:521437084760:web:016f9a5f8f3292b253de2d",
+    measurementId: "G-PVD6828CLP"
   }
 };
 
@@ -23,4 +23,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import 'zone.js/dist/zone-error';  // Included with Angular CLI.

@@ -1,6 +1,7 @@
 import{ Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
+import {Mutex} from 'async-mutex';
 
 import {Game, GAME_STATUS, GameService, CARDS_URL} from '../game.service';
 import {Player, PLAYER_ROLE, PlayerRole} from '../player';
@@ -21,6 +22,8 @@ export class GameComponent implements OnInit, OnDestroy {
   players: Player[];
   playerRoles: PlayerRole[] = [];
   firstRoundIsOver: boolean = false;
+  playersOrder: Object = {};
+  private playersOrderMutex: Mutex = new Mutex();
   private _subscriptions: any[] = [];
 
   constructor( private gameService: GameService,
@@ -48,14 +51,12 @@ export class GameComponent implements OnInit, OnDestroy {
       }
       this.game = game;
 
-      if(this.game.status === GAME_STATUS.WORKING) {
-        if(this.playerRole)
-          this.playerRole = undefined;
-        if(this.playerRoles.length > 0)
-          this.playerRoles.length = 0;
-        this.firstRoundIsOver = false;
-      } else if(this.game.status === GAME_STATUS.PLAYING && !this.playerRole) {
-        this.gameService.getPlayerRole(this.player).then(pr => this.playerRole = pr);
+      if(this.game.status === GAME_STATUS.OPEN || this.game.status === GAME_STATUS.WORKING) {
+        this.resetVars()
+      } else if(this.game.status === GAME_STATUS.PLAYING) {
+        if(!this.playerRole)
+          this.gameService.getPlayerRole(this.player).then(pr => this.playerRole = pr);
+        this.computePlayerOrder();
       } else if(this.game.status === GAME_STATUS.CLOSED) {
         if(this.game.winner !== undefined) {
           this.fetchMissingPlayerRoles(true);
@@ -79,6 +80,7 @@ export class GameComponent implements OnInit, OnDestroy {
           return;
         }
         this.fetchMissingPlayerRoles();
+        this.computePlayerOrder();
       }
     }));
   }
@@ -100,12 +102,25 @@ export class GameComponent implements OnInit, OnDestroy {
     this.gameService.kickPlayer(this.player);
   }
 
+  resetVars(): void {
+    this.playerRole = undefined;
+    this.playerRoles.length = 0;
+    this.firstRoundIsOver = false;
+    this.playersOrder = {}
+  }
+
   get gameUrlToShare(): string {
     return window.origin + '/?join-game=' + this.game.id;
   }
 
   startGame(): void {
+    this.firstRoundIsOver = false; // reset first round
     this.gameService.startGame();
+  }
+
+  reopenGame(): void {
+    // difference with `startGame` is that game will go to OPEN status and so accept new players to join
+    this.gameService.reopenGame();
   }
 
   getCardImage(player: Player): string {
@@ -227,6 +242,27 @@ export class GameComponent implements OnInit, OnDestroy {
 
   get maxPlayers(): number {
     return this.gameService.MAX_PLAYERS;
+  }
+
+  async computePlayerOrder() {
+    const release = await this.playersOrderMutex.acquire()
+    this.playersOrder = {};
+    if(this.players && this.players.length && this.game && this.game.firstToPlay) {
+      let firstToPlayIndex = this.players.findIndex(p => p.id === this.game.firstToPlay);
+      let order = 1;
+      let idx = firstToPlayIndex + 1;
+      this.playersOrder[this.players[firstToPlayIndex]["id"]] = order++;
+      do {
+        if(idx === this.players.length)
+          idx = 0;
+        this.playersOrder[this.players[idx++]["id"]] = order++;
+      }while(order <= this.players.length)
+    }
+    release();
+  }
+
+  getPlayerOrder(player: Player): number | undefined {
+    return this.playersOrder[player.id];
   }
 
 }

@@ -14,23 +14,45 @@
 
   <div class="section">
 
-    <button mat-raised-button (click)="createGame(username)" [class.uc-accent]="!gameId"
-            [disabled]="!canCreateGame(username)">
-      Créer une nouvelle partie
-    </button>
+    <div *ngIf="!gameIdFromUrl">
+      <button mat-raised-button (click)="createGame(username)" [class.uc-accent]="!gameId"
+              [disabled]="!canCreateGame(username)">
+        Créer une nouvelle partie
+      </button>
 
-    <div class="section">ou</div>
+      <div class="section">ou</div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>ID de partie existante</mat-label>
-      <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
-      <mat-icon matSuffix>casino</mat-icon>
-    </mat-form-field><br>
+      <mat-form-field appearance="outline">
+        <mat-label>ID de partie existante</mat-label>
+        <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
+        <mat-icon matSuffix>casino</mat-icon>
+      </mat-form-field><br>
 
-    <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
-            [disabled]="!canJoinExistingGame(username, gameId)">
-      Rejoindre une partie existante
-    </button>
+      <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
+              [disabled]="!canJoinExistingGame(username, gameId)">
+        Rejoindre une partie existante
+      </button>
+    </div>
+
+    <div *ngIf="gameIdFromUrl">
+      <mat-form-field appearance="outline">
+        <mat-label>ID de partie existante</mat-label>
+        <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
+        <mat-icon matSuffix>casino</mat-icon>
+      </mat-form-field><br>
+
+      <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
+              [disabled]="!canJoinExistingGame(username, gameId)">
+        Rejoindre une partie existante
+      </button>
+
+      <div class="section">ou</div>
+
+      <button mat-stroked-button (click)="createGame(username)"
+              [disabled]="!canCreateGame(username)">
+        Créer une nouvelle partie
+      </button>
+    </div>
 
   </div>
 
@@ -38,26 +60,29 @@
 
   <div id="rules" class="aligner section">
     <mat-icon aria-label="Les règles du jeu">menu_book</mat-icon>
-    <a href="https://docs.google.com/document/d/1EDZ2YxqaB-I0SyUyGoJwJbAEnuiE1FjVnu5MTlKz4X8/view" target="_blank">Les règles du jeu</a>
+    <a href="https://docs.google.com/document/d/1EDZ2YxqaB-I0SyUyGoJwJbAEnuiE1FjVnu5MTlKz4X8/view" target="_blank" rel="noopener noreferrer">Les règles du jeu</a>
   </div>
 
   <div id="feedbacks" class="aligner section">
     <mat-icon aria-label="Tes commentaires">chat</mat-icon>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScFQJ-jgiBPQS_x71HSikIngQmepNze8H-mT1T1v2QvLMUZ3A/viewform" target="_blank">Pour faire part d'un bug ou d'une idée</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScFQJ-jgiBPQS_x71HSikIngQmepNze8H-mT1T1v2QvLMUZ3A/viewform" target="_blank" rel="noopener noreferrer">Pour faire part d'un bug ou d'une idée</a>
   </div>
 
   <div id="github" class="aligner section">
     <mat-icon aria-label="Repository Github" svgIcon="github"></mat-icon>
-    <a href="https://github.com/Vallenain/undercovid" target="_blank">Le code sur GitHub</a>
+    <a href="https://github.com/Vallenain/undercovid" target="_blank" rel="noopener noreferrer">Le code sur GitHub</a>
   </div>
 
   <p>
-    Ce jeu s’inspire du jeu Undercover^^ (<a href="https://www.yanstarstudio.com/">YANSTARSTUDIO</a>)
-    disponible sur mobile sur <a href="https://apps.apple.com/fr/app/undercover/id946882449">iOS</a> et
-    <a href="https://play.google.com/store/apps/dev?id=7207187407796202897&hl=fr">Android</a>.<br>
+    Ce jeu s’inspire du jeu Undercover^^ (<a href="https://www.yanstarstudio.com/" target="_blank" rel="noopener noreferrer">YANSTARSTUDIO</a>)
+    disponible sur mobile sur <a href="https://apps.apple.com/fr/app/undercover/id946882449" target="_blank" rel="noopener noreferrer">iOS</a> et
+    <a href="https://play.google.com/store/apps/dev?id=7207187407796202897&hl=fr" target="_blank" rel="noopener noreferrer">Android</a>.<br>
     Undercovid ne durera que le temps du confinement. Déso pour les auteurs du jeu original.
   </p><p>
     De même, toutes les images utilisées dans l’application ne sont pas forcément libres de droit.<br>
     Et pour ainsi dire je ne sais pas à qui elles appartiennent. Déso encore.
+  </p>
+  <p>
+    v1.1
   </p>
 </div>

@@ -15,6 +15,7 @@ export class WelcomeComponent implements OnInit {
   isBusy: boolean = false;
   username: string;
   gameId: string;
+  gameIdFromUrl: boolean = false;
 
   constructor(private gameService: GameService,
   private router: Router,
@@ -25,6 +26,7 @@ export class WelcomeComponent implements OnInit {
     let gameId = this.route.snapshot.queryParamMap.get("join-game");
     if(gameId) {
       this.gameId = gameId;
+      this.gameIdFromUrl = true;
     }
   }
 
