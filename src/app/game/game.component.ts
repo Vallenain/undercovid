@@ -23,7 +23,7 @@ export class GameComponent implements OnInit, OnDestroy {
   playerRoles: PlayerRole[] = [];
   firstRoundIsOver: boolean = false;
   playersOrder: Object = {};
-  playersOrderMutex: Mutex = new Mutex();
+  private playersOrderMutex: Mutex = new Mutex();
   private _subscriptions: any[] = [];
 
   constructor( private gameService: GameService,

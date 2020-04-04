@@ -68,6 +68,40 @@ function getPlayersWithRole(querySnapshot) {
   return players;
 }
 
+function pickWords(gameId) {
+  return db.collection('words').get().then(qs1 => {
+    return db.collection('games/'+gameId+'/words').get().then(qs2 => {
+      let words;
+      let iterations = 0;
+      let found = false;
+
+      do {
+        let randomIdx = Math.floor(Math.random() * qs1.docs.length);
+        words = qs1.docs[randomIdx];
+        if(!qs2.exists || !qs2.docs.find(d => d.id === words.id))
+          found = true;
+        iterations++;
+      } while(!found && iterations < qs1.docs.length)
+
+      if(!found) {
+        console.log(`[${gameId}] Wow, hard to find a pair never used. Reusing a pair`);
+      }
+
+      let word1or2 = Math.floor(Math.random() * 2);
+      let pangolinWord = word1or2 === 0 ? words.get('word1') : words.get('word2');
+      let batWord = word1or2 === 1 ? words.get('word1') : words.get('word2');
+
+      console.log(`[${gameId}] Words have been picked: batWord=${batWord}, pangolinWord=${pangolinWord}`)
+      return db.doc('games/'+gameId+'/words/'+words.id).set(words.data()).then(() => {
+        return {
+          pangolinWord: pangolinWord,
+          batWord: batWord
+        }
+      })
+    })
+  })
+}
+
 function startGame(gameId) {
   console.log(`[${gameId}] Just moved to WORKING status`);
 
@@ -85,14 +119,7 @@ function startGame(gameId) {
     console.log(`[${gameId}] Roles have been assigned: ${JSON.stringify(players)}`);
 
     // 2 : pick two words
-    return db.collection('words').get().then(querySnapshot => {
-      let randomIdx = Math.floor(Math.random() * querySnapshot.docs.length);
-      let words = querySnapshot.docs[randomIdx].data();
-      let word1or2 = Math.floor(Math.random() * 2);
-      let pangolinWord = word1or2 === 0 ? words.word1 : words.word2;
-      let batWord = word1or2 === 1 ? words.word1 : words.word2;
-
-      console.log(`[${gameId}] Words have been picked: batWord=${batWord}, pangolinWord=${pangolinWord}`)
+    return pickWords(gameId).then(words => {
 
       // 3 : assign words to player roles + tell who's first to play
       let nbBats = nbPangolins = nbGoodVirus = 0;
@@ -102,12 +129,12 @@ function startGame(gameId) {
           p.word = "";
           nbGoodVirus += 1;
         } else if(p.role === PLAYER_ROLE.BAT) {
-          p.word = batWord;
+          p.word = words.batWord;
           nbBats += 1;
           if(!firstToPlay)
             firstToPlay = p.id;
         } else if(p.role === PLAYER_ROLE.PANGOLIN) {
-          p.word = pangolinWord;
+          p.word = words.pangolinWord;
           nbPangolins += 1;
           if(!firstToPlay)
             firstToPlay = p.id;

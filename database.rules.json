@@ -17,6 +17,10 @@ service cloud.firestore {
     	allow delete: if true;
     }
 
+    match /games/{game}/words/{word} {
+    	allow read, write: if false;
+    }
+
     match /words/{word} {
     	allow create: if true;
     }
