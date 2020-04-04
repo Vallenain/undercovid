@@ -14,23 +14,45 @@
 
   <div class="section">
 
-    <button mat-raised-button (click)="createGame(username)" [class.uc-accent]="!gameId"
-            [disabled]="!canCreateGame(username)">
-      Créer une nouvelle partie
-    </button>
+    <div *ngIf="!gameIdFromUrl">
+      <button mat-raised-button (click)="createGame(username)" [class.uc-accent]="!gameId"
+              [disabled]="!canCreateGame(username)">
+        Créer une nouvelle partie
+      </button>
 
-    <div class="section">ou</div>
+      <div class="section">ou</div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>ID de partie existante</mat-label>
-      <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
-      <mat-icon matSuffix>casino</mat-icon>
-    </mat-form-field><br>
+      <mat-form-field appearance="outline">
+        <mat-label>ID de partie existante</mat-label>
+        <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
+        <mat-icon matSuffix>casino</mat-icon>
+      </mat-form-field><br>
 
-    <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
-            [disabled]="!canJoinExistingGame(username, gameId)">
-      Rejoindre une partie existante
-    </button>
+      <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
+              [disabled]="!canJoinExistingGame(username, gameId)">
+        Rejoindre une partie existante
+      </button>
+    </div>
+
+    <div *ngIf="gameIdFromUrl">
+      <mat-form-field appearance="outline">
+        <mat-label>ID de partie existante</mat-label>
+        <input matInput placeholder="20 caractères" type="text" name="gameId" [(ngModel)]="gameId">
+        <mat-icon matSuffix>casino</mat-icon>
+      </mat-form-field><br>
+
+      <button mat-raised-button (click)="joinGame(username, gameId)" class="uc-accent"
+              [disabled]="!canJoinExistingGame(username, gameId)">
+        Rejoindre une partie existante
+      </button>
+
+      <div class="section">ou</div>
+
+      <button mat-stroked-button (click)="createGame(username)"
+              [disabled]="!canCreateGame(username)">
+        Créer une nouvelle partie
+      </button>
+    </div>
 
   </div>
 
