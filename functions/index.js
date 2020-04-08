@@ -78,7 +78,7 @@ function pickWords(gameId) {
       do {
         let randomIdx = Math.floor(Math.random() * qs1.docs.length);
         words = qs1.docs[randomIdx];
-        if(!qs2.exists || !qs2.docs.find(d => d.id === words.id))
+        if(!qs2.docs.find(d => d.id === words.id))
           found = true;
         iterations++;
       } while(!found && iterations < qs1.docs.length)
@@ -392,3 +392,23 @@ exports.checkIfGameMasterIsMissing = functions.region('europe-west1').firestore
         }
       })
     })
+
+exports.countGames = functions.region('europe-west1').https.onRequest((req, res) => {
+  if(req.method !== 'GET')
+    return res.status(405).end();
+
+  db.collection('games').get().then(querySnapshot => {
+    let totalGames = querySnapshot.size;
+    let closedGames = querySnapshot.docs.filter(d => d.get('status') === GAME_STATUS.CLOSED).length;
+    console.log(`TotalGames: ${totalGames} - closedGames: ${closedGames}`);
+
+    return db.doc('stats/GENERAL').update({
+      nbClosedGames: closedGames,
+      nbOpenGames: totalGames - closedGames
+    })
+  }).then(()=>res.status(200).end()).catch(error => {
+    console.error(error);
+    return res.status(500).end()
+  });
+
+});

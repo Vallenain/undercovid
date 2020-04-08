@@ -4,6 +4,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 
 
 import {GameService} from '../game.service';
+import {Stats, StatsService} from '../stats.service';
 
 @Component({
   selector: 'app-welcome',
@@ -16,8 +17,11 @@ export class WelcomeComponent implements OnInit {
   username: string;
   gameId: string;
   gameIdFromUrl: boolean = false;
+  statsLoaded: boolean = false;
+  stats: Stats;
 
   constructor(private gameService: GameService,
+  private statsService: StatsService,
   private router: Router,
   private snackbar: MatSnackBar,
   private route: ActivatedRoute) { }
@@ -28,6 +32,12 @@ export class WelcomeComponent implements OnInit {
       this.gameId = gameId;
       this.gameIdFromUrl = true;
     }
+
+    this.statsService.getStats().then(stats => {
+      this.stats = stats;
+      this.statsLoaded = true;
+    })
+
   }
 
   joinGame(username: string, gameId: string): void {

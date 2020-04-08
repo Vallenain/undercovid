@@ -58,6 +58,14 @@
 
   <mat-divider></mat-divider>
 
+  <div id="stats" *ngIf="statsLoaded" class="aligner section">
+    <mat-icon>thumb_up</mat-icon>
+    Plus de <strong>&nbsp;{{ stats.nbClosedGames }}&nbsp;</strong> parties ont été jouées et <strong>&nbsp;{{ stats.nbOpenGames }}&nbsp;</strong> sont en cours !
+    <mat-icon>thumb_up</mat-icon>
+  </div>
+
+  <mat-divider></mat-divider>
+
   <div id="rules" class="aligner section">
     <mat-icon aria-label="Les règles du jeu">menu_book</mat-icon>
     <a href="https://docs.google.com/document/d/1EDZ2YxqaB-I0SyUyGoJwJbAEnuiE1FjVnu5MTlKz4X8/view" target="_blank" rel="noopener noreferrer">Les règles du jeu</a>
