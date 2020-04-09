@@ -301,6 +301,25 @@ function checkGuessedWord(gameId, playerId, guessWord) {
   })
 }
 
+function countGames() {
+  return db.collection('games').get().then(querySnapshot => {
+    let totalGames = querySnapshot.size;
+    let closedGames = querySnapshot.docs.filter(d => d.get('status') === GAME_STATUS.CLOSED).length;
+    console.log(`TotalGames: ${totalGames} - closedGames: ${closedGames}`);
+
+    return db.doc('stats/GENERAL').update({
+      nbClosedGames: closedGames,
+      nbOpenGames: totalGames - closedGames
+    })
+  })
+}
+
+exports.onStartGame = functions.region('europe-west1').firestore
+  .document('games/{gameId}')
+  .onCreate((snap, context) => {
+    return countGames();
+  })
+
 exports.checkStartGame = functions.region('europe-west1').firestore
   .document('games/{gameId}')
   .onUpdate((change, context) => {
@@ -393,22 +412,38 @@ exports.checkIfGameMasterIsMissing = functions.region('europe-west1').firestore
       })
     })
 
-exports.countGames = functions.region('europe-west1').https.onRequest((req, res) => {
-  if(req.method !== 'GET')
+exports.countGamesFromCron = functions.region('europe-west1').https.onRequest((req, res) => {
+  if(req.method !== 'POST')
     return res.status(405).end();
 
-  db.collection('games').get().then(querySnapshot => {
-    let totalGames = querySnapshot.size;
-    let closedGames = querySnapshot.docs.filter(d => d.get('status') === GAME_STATUS.CLOSED).length;
-    console.log(`TotalGames: ${totalGames} - closedGames: ${closedGames}`);
-
-    return db.doc('stats/GENERAL').update({
-      nbClosedGames: closedGames,
-      nbOpenGames: totalGames - closedGames
-    })
-  }).then(()=>res.status(200).end()).catch(error => {
+  countGames().then(()=>res.status(200).end()).catch(error => {
     console.error(error);
     return res.status(500).end()
   });
+});
+
+exports.closeOpenGamesFromCron = functions.region('europe-west1').https.onRequest((req, res) => {
+  if(req.method !== 'POST')
+    return res.status(405).end();
+
+  db.collection('games').where('status', 'in', [GAME_STATUS.OPEN, GAME_STATUS.PLAYING]).get().then(querySnapshot => {
+    let now = new Date();
+    let THIRTY_MIN_IN_MS = 30 * 60 * 1000;
+    let docsToUpdate = querySnapshot.docs.filter(d => {
+      let mostRecentDate = d.get('startedAt') ? d.get('startedAt') : d.get('createdAt');
+      return now - mostRecentDate > THIRTY_MIN_IN_MS
+    });
+
+    console.log(`Found ${docsToUpdate.length} games to close by cron.`)
+
+    let promises = docsToUpdate.map(d => {
+      return d.ref.update({status: GAME_STATUS.CLOSED, cronClosed: true, finishedAt: now});
+    });
+
+    return Promise.all(promises);
+  }).then(()=>res.status(200).end()).catch(error => {
+    console.error(error);
+    return res.status(500).end();
+  })
 
 });
