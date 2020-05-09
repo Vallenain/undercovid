@@ -1,0 +1,21 @@
+{
+    "name": "Undercovid",
+    "short_name": "Undercovid",
+    "icons": [
+        {
+            "src": "/assets/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/android-chrome-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#0a3d62",
+    "background_color": "#fafafa",
+    "display": "standalone",
+    "scope": "./",
+    "start_url": "./"
+}
